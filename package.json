@@ -1,0 +1,27 @@
+{
+  "name": "services-manager",
+  "version": "0.0.0",
+  "description": "Manage service instances.",
+  "main": "index.js",
+  "scripts": {
+    "test": "npx mocha t/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/diasbruno/services-manager.git"
+  },
+  "keywords": [
+    "services",
+    "services",
+    "manager"
+  ],
+  "author": "Bruno Dias",
+  "license": "Unlicense",
+  "bugs": {
+    "url": "https://github.com/diasbruno/services-manager/issues"
+  },
+  "homepage": "https://github.com/diasbruno/services-manager#readme",
+  "dependencies": {
+    "mocha": "^9.1.3"
+  }
+}
