@@ -21,26 +21,26 @@ describe('Instantiator', () => {
   beforeEach(() => (i = new Instantiator()));
 
   it('should create a new instance.', () => {
-    i.add(A);
+    i.addSingleInstance(A);
     assert.ok(i.get(A.name) instanceof A);
   });
 
   it('must return the same instance.', () => {
-    i.add(A);
+    i.addSingleInstance(A);
     assert.ok(i.get(A.name) === i.get(A.name));
   });
 
   it('must resolve its dependencies.', () => {
-    i.add(A);
-    i.add(B);
-    i.add(C);
-    i.add(S);
+    i.addSingleInstance(A);
+    i.addSingleInstance(B);
+    i.addSingleInstance(C);
+    i.addSingleInstance(S);
     assert.ok(i.get(A.name) === i.get(S.name).a);
   });
 
   it('must throw if it cannot resolve dependency.', () => {
     try {
-      i.add(S);
+      i.addSingleInstance(S);
     } catch (e) {
       assert.ok(/\'A\'/.exec(e.message)[1]);
     }

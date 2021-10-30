@@ -38,9 +38,13 @@ module.exports = class Instantiator {
     this.services = new Map();
   }
 
-  add(service) {
+  make(service, strategy) {
     const deps = findDependencies(service);
-    this.services[service.name] = new SingleInstance(service, deps);
+    this.services[service.name] = new strategy(service, deps);
+  }
+
+  addSingleInstance(service) {
+    this.make(service, SingleInstance);
   }
 
   instance(service) {
