@@ -45,4 +45,30 @@ describe('Instantiator', () => {
       assert.ok(/\'A\'/.exec(e.message)[1]);
     }
   });
+
+  it('must instantiate a service and dont cache.', () => {
+    class T {}
+    class V {
+      constructor(T) {
+        this.t = T;
+      }
+    }
+    i.addNoCache(T);
+    i.addSingleInstance(V);
+    assert.ok(i.get(T.name) !== i.get(V.name).t);
+  });
+
+  it('must instantiate a new service with same dependency.', () => {
+    class T {}
+    class V {
+      constructor(T) {
+        this.t = T;
+      }
+    }
+    i.addSingleInstance(T);
+    i.addNoCache(V);
+    const v = i.get(V.name);
+    assert.ok(i.get(T.name) === v.t);
+    assert.ok(i.get(V.name) !== v);
+  });
 });

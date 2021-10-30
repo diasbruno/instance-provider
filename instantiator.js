@@ -6,6 +6,19 @@ const SINGLE_INSTANCE = 'SINGLE_INSTANCE';
 
 const deps = ds => ds.replace(/[\,\s]+/g, ',').split(',');
 
+class AlwaysNew {
+  constructor(service, deps) {
+    this.service = service;
+    this.deps = deps;
+    this.instance = null;
+  }
+
+  get(services) {
+    const dependencies = this.deps.map(d => services.get(d));
+    return new this.service(...dependencies);
+  }
+}
+
 class SingleInstance {
   constructor(service, deps) {
     this.service = service;
@@ -45,6 +58,10 @@ module.exports = class Instantiator {
 
   addSingleInstance(service) {
     this.make(service, SingleInstance);
+  }
+
+  addNoCache(service) {
+    this.make(service, AlwaysNew);
   }
 
   instance(service) {
