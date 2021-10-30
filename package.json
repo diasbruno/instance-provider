@@ -1,6 +1,6 @@
 {
-  "name": "services-manager",
-  "version": "0.0.0",
+  "name": "instance-provider",
+  "version": "1.0.0",
   "description": "Manage service instances.",
   "main": "index.js",
   "scripts": {
