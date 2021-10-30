@@ -1,10 +1,11 @@
 const NODEPS = [];
 
 const CONSTRUCTOR_R = /\bconstructor\((.*)\)/;
+const COMMA_R = /[\,\s]+/g;
 
 const SINGLE_INSTANCE = 'SINGLE_INSTANCE';
 
-const deps = ds => ds.replace(/[\,\s]+/g, ',').split(',');
+const deps = ds => ds.replace(COMMA_R, ',').split(',');
 
 class AlwaysNew {
   constructor(service, deps) {
