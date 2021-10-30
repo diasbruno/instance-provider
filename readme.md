@@ -1,4 +1,6 @@
-# instantiator
+# instance-provider
+
+Not a new idea...
 
 Manage instantiation and lifetime of classes.
 
