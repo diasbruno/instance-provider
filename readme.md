@@ -74,10 +74,10 @@ class UserService {
   }
 }
 
-const instantiator = require('./index.js');
+const Provider = require('instance-provider');
 
 // define how the lifetime of the services
-instantiator.addSingleInstance(AuthToken).
+Provider.addSingleInstance(AuthToken).
   addSingleInstance(UserDataSource).
   addSingleInstance(AuthService).
   addSingleInstance(UserService);
@@ -85,19 +85,19 @@ instantiator.addSingleInstance(AuthToken).
 function login(name, pass) {
   // instances are created lazily, so only
   // whem they are requested
-  const service = instantiator.get(AuthService.name);
+  const service = Provider.get(AuthService.name);
   return service.login(name, pass).then(
     () => {
-      const service = instantiator.get(UserServices.name);
+      const service = Provider.get(UserServices.name);
       console.log(service.all());
     }
   );
 }
 
 function logout() {
-  instantiator.get(AuthToken.name).updateToken(null);
+  Provider.get(AuthToken.name).updateToken(null);
   // throw away all retained instances
-  instantiator.dispose();
+  Provider.dispose();
 }
 ```
 
