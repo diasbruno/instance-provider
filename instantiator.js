@@ -18,6 +18,8 @@ class AlwaysNew {
     const dependencies = this.deps.map(d => services.get(d));
     return new this.service(...dependencies);
   }
+
+  dispose() {}
 }
 
 class SingleInstance {
@@ -36,6 +38,10 @@ class SingleInstance {
 
   get(services) {
     return this.instance || this.instantiate(services);
+  }
+
+  dispose() {
+    this.instance = null;
   }
 }
 
@@ -75,5 +81,12 @@ module.exports = class Instantiator {
 
   get(service) {
     return this.instance(service);
+  }
+
+  dispose() {
+    for (let s in this.services) {
+      const service = this.services[s];
+      service.dispose();
+    }
   }
 }

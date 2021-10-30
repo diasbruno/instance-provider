@@ -83,4 +83,14 @@ describe('Instantiator', () => {
     assert.ok(t === i.get(T.name));
     assert.ok(v !== i.get(V.name));
   });
+
+  it('dispose instances of services.', () => {
+    class T {}
+    class V {}
+    i.addSingleInstance(T);
+    i.addNoCache(V);
+    const t = i.get(T.name);
+    i.dispose();
+    assert.ok(t !== i.get(T.name));
+  });
 });
