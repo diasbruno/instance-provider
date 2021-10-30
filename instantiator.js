@@ -64,11 +64,11 @@ module.exports = class Instantiator {
   }
 
   addSingleInstance(service) {
-    this.make(service, SingleInstance);
+    return this.make(service, SingleInstance), this;
   }
 
   addNoCache(service) {
-    this.make(service, AlwaysNew);
+    return this.make(service, AlwaysNew), this;
   }
 
   instance(service) {
