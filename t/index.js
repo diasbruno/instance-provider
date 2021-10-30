@@ -71,4 +71,16 @@ describe('Instantiator', () => {
     assert.ok(i.get(T.name) === v.t);
     assert.ok(i.get(V.name) !== v);
   });
+
+  it('same class different strategies (through extension).', () => {
+    class T {}
+    class V extends T {}
+    i.addSingleInstance(T);
+    i.addNoCache(V);
+    const v = i.get(V.name);
+    const t = i.get(T.name);
+    assert.ok(v !== t);
+    assert.ok(t === i.get(T.name));
+    assert.ok(v !== i.get(V.name));
+  });
 });
