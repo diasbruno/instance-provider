@@ -9,7 +9,8 @@ and automatically handle their lifetime.
 
 ## usage
 
-see [example.js](https://github.com/diasbruno/instantiator/blob/main/example.js)
+[React codesandbox](https://codesandbox.io/s/using-instance-provider-with-react-dxi9v)
+[Vue codesandbox](https://codesandbox.io/s/using-instance-provider-with-vue-w4b85)
 
 
 ## license
