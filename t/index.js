@@ -42,21 +42,6 @@ const Instantiator = require('../instantiator.js');
     }
   ],
   [
-    'must throw if it cannot resolve dependency.', (i) => {
-      try {
-        class S {}
-        S.create = function(A) {
-          const instance = new this();
-          instance.a = A;
-          return instance;
-        };
-        i.addSingleInstance(S);
-      } catch (e) {
-        assert.ok(/\'A\'/.exec(e.message)[1]);
-      }
-    }
-  ],
-  [
     'must instantiate a service and dont cache.', (i) => {
       class T {}
       T.create = function() { return new this(); };
@@ -137,6 +122,33 @@ const Instantiator = require('../instantiator.js');
       assert.ok(Boolean((t = i.get(T.name))));
       assert.ok(Boolean(i.get(U.name)));
       assert.ok(i.get(V.name).t === t);
+    }
+  ],
+  [
+    'must throw if it cannot instantiate.', (i) => {
+      try {
+        function S() {}
+        i.get(S.name);
+      } catch (e) {
+        assert.ok(/\'S\'/.test(e.message));
+        assert.ok(!/dependency/.test(e.message));
+      }
+    }
+  ],
+  [
+    'must throw if it cannot deliver a dependency.', (i) => {
+      try {
+        class U { }
+        U.create = (T) => {
+          const u = new U();
+          u.t = T;
+          return u;
+        };
+        i.addSingleInstance(U);
+      } catch (e) {
+        assert.ok(/\'T\'/.test(e.message));
+        assert.ok(/dependency/.test(e.message));
+      }
     }
   ]
 ].forEach(([title, test]) => {

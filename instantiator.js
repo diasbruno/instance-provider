@@ -7,6 +7,16 @@ const SINGLE_INSTANCE = 'SINGLE_INSTANCE';
 
 const deps = ds => ds.replace(COMMA_R, ',').split(',');
 
+function build(services, service, deps) {
+  let dependencies = [];
+  try {
+    dependencies = deps.map(d => services.get(d));
+  } catch(e) {
+    throw new Error(`${e.message} [dependency]`);
+  }
+  return service.create(...dependencies);
+}
+
 class AlwaysNew {
   constructor(service, deps) {
     this.service = service;
@@ -15,8 +25,7 @@ class AlwaysNew {
   }
 
   get(services) {
-    const dependencies = this.deps.map(d => services.get(d));
-    return this.service.create(...dependencies);
+    return build(services, this.service, this.deps);
   }
 
   dispose() {}
@@ -30,8 +39,7 @@ class SingleInstance {
   }
 
   instantiate(services) {
-    const dependencies = this.deps.map(d => services.get(d));
-    return this.instance = this.service.create(...dependencies);
+    return this.instance = build(services, this.service, this.deps);
   }
 
   get(services) {
@@ -70,16 +78,16 @@ module.exports = class Instantiator {
     return this.make(service, AlwaysNew), this;
   }
 
-  instance(service) {
+  get(service) {
     const _ = this.services[service];
     if (!_) {
       throw Error(`Service '${service}' not found`);
     }
-    return _.get(this);
-  }
-
-  get(service) {
-    return this.instance(service);
+    const instance = _.get(this);
+    if (!instance) {
+      throw new Error(`Cannot instantiate '${service}'.`);
+    }
+    return instance;
   }
 
   dispose() {
