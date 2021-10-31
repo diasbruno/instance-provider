@@ -135,8 +135,8 @@ Provider.addSingleInstance(AuthToken).
     const userService = Provider.get(UserService.name);
     const users = await userService.all();
   } catch(e) {
-    console.log(e.message);
     console.log("- not logged yet");
+    console.log(e.message);
   }
 
   try {
