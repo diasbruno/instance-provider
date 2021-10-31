@@ -6,6 +6,10 @@ const localStorage = {
   setItem(name, item) { this.mem[name] = item; },
 };
 
+function unauthorized() {
+  throw new Error('Unauthorized');
+};
+
 function http(config) {
   this.config = config;
 }
@@ -25,13 +29,17 @@ http.post = function(url, data) {
 
 http.prototype.get = function(url) {
   const mocks = {
-    '/users': () => Promise.resolve([
-      { id: 1, name: 'First' },
-      { id: 2, name: 'Second' }
-    ]),
-    '/user/1': () => {
-      throw new Error('Unauthorized');
-    }
+    '/users': () => {
+      if (!this.config.token)  {
+        unauthorized();
+      }
+
+      return Promise.resolve([
+        { id: 1, name: 'First' },
+        { id: 2, name: 'Second' }
+      ]);
+    },
+    '/user/1': unauthorized
   };
   return mocks[url]();
 };
@@ -148,5 +156,13 @@ Provider.addSingleInstance(AuthToken).
 
     const authToken = Provider.get(AuthToken.name);
     console.log("- token after logout", `'${authToken.token}'`);
+  }
+
+  try {
+    const userService = Provider.get(UserService.name);
+    const users = await userService.all();
+  } catch(e) {
+    console.log(e.message);
+    console.log("- not logged again");
   }
 })();
