@@ -5,6 +5,7 @@ const Instantiator = require('../instantiator.js');
   [
     'should create a new instance.', (i) => {
       class A {}
+      A.create = function() { return new this(); };
       i.addSingleInstance(A);
       assert.ok(i.get(A.name) instanceof A);
     }
@@ -12,6 +13,7 @@ const Instantiator = require('../instantiator.js');
   [
     'must return the same instance.', (i) => {
       class A {}
+      A.create = function() { return new this(); };
       i.addSingleInstance(A);
       assert.ok(i.get(A.name) === i.get(A.name));
     }
@@ -19,15 +21,19 @@ const Instantiator = require('../instantiator.js');
   [
     'must resolve its dependencies.', (i) => {
       class A {}
+      A.create = function() { return new this(); };
       class B {}
+      B.create = function() { return new this(); };
       class C {}
-      class S {
-        constructor(A, B, C) {
-          this.a = A;
-          this.b = B;
-          this.c = C;
-        }
-      }
+      C.create = function() { return new this(); };
+      class S {}
+      S.create = function(A, B, C) {
+        const instance = new this();
+        instance.a = A;
+        instance.b = B;
+        instance.c = C;
+        return instance;
+      };
       i.addSingleInstance(A).
         addSingleInstance(B).
         addSingleInstance(C).
@@ -38,11 +44,12 @@ const Instantiator = require('../instantiator.js');
   [
     'must throw if it cannot resolve dependency.', (i) => {
       try {
-        class S {
-          constructor(A) {
-            this.a = A;
-          }
-        }
+        class S {}
+        S.create = function(A) {
+          const instance = new this();
+          instance.a = A;
+          return instance;
+        };
         i.addSingleInstance(S);
       } catch (e) {
         assert.ok(/\'A\'/.exec(e.message)[1]);
@@ -52,11 +59,13 @@ const Instantiator = require('../instantiator.js');
   [
     'must instantiate a service and dont cache.', (i) => {
       class T {}
-      class V {
-        constructor(T) {
-          this.t = T;
-        }
-      }
+      T.create = function() { return new this(); };
+      class V {}
+      V.create = function(T) {
+        const instance = new this();
+        instance.t = T;
+        return instance;
+      };
       i.addNoCache(T).
         addSingleInstance(V);
       assert.ok(i.get(T.name) !== i.get(V.name).t);
@@ -65,11 +74,13 @@ const Instantiator = require('../instantiator.js');
   [
     'must instantiate a new service with same dependency.', (i) => {
       class T {}
-      class V {
-        constructor(T) {
-          this.t = T;
-        }
-      }
+      T.create = function() { return new this(); };
+      class V {}
+      V.create = function(T) {
+        const instance = new this();
+        instance.t = T;
+        return instance;
+      };
       i.addSingleInstance(T).
         addNoCache(V);
       const v = i.get(V.name);
@@ -80,7 +91,9 @@ const Instantiator = require('../instantiator.js');
   [
     'same class different strategies (through extension).', (i) => {
       class T {}
+      T.create = function() { return new this(); };
       class V extends T {}
+      V.create = function() { return new this(); };
       i.addSingleInstance(T).
         addNoCache(V);
       const v = i.get(V.name);
@@ -93,12 +106,37 @@ const Instantiator = require('../instantiator.js');
   [
     'dispose instances of services.', (i) => {
       class T {}
+      T.create = function() { return new this(); };
       class V {}
+      V.create = function() { return new this(); };
       i.addSingleInstance(T).
         addNoCache(V);
       const t = i.get(T.name);
       i.dispose();
       assert.ok(t !== i.get(T.name));
+    }
+  ],
+  [
+    'can handle arrow function.', (i) => {
+      class T {}
+      T.create = () => new T();
+      class U {}
+      U.create = (T) => {
+        const u = new V();
+        u.t = T;
+        return u;
+      };
+      class V {}
+      V.create = (T, U) => {
+        const v = new V();
+        v.t = T; v.u = U;
+        return v;
+      };
+      i.addSingleInstance(T).addSingleInstance(U).addSingleInstance(V);
+      let t;
+      assert.ok(Boolean((t = i.get(T.name))));
+      assert.ok(Boolean(i.get(U.name)));
+      assert.ok(i.get(V.name).t === t);
     }
   ]
 ].forEach(([title, test]) => {

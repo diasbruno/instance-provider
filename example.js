@@ -64,6 +64,8 @@ class AuthToken {
   }
 }
 
+AuthToken.create = function() { return new this(); };
+
 // this is the data source where we actually deal
 // with users
 class UserDataSource {
@@ -87,6 +89,10 @@ class UserDataSource {
   }
 }
 
+UserDataSource.create = function(AuthToken) {
+  return new this(AuthToken);
+};
+
 // a simple auth service
 class AuthService {
   constructor(AuthToken) {
@@ -103,6 +109,10 @@ class AuthService {
   }
 }
 
+AuthService.create = function(AuthToken) {
+  return new this(AuthToken);
+};
+
 // a simple user service that will use the UserDataSource
 class UserService {
   constructor(UserDataSource) {
@@ -117,6 +127,10 @@ class UserService {
     return this.dataSource.byId(id);
   }
 }
+
+UserService.create = function(UserDataSource) {
+  return new this(UserDataSource);
+};
 
 const Provider = require('./index');
 

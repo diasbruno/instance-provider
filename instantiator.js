@@ -1,6 +1,6 @@
 const NODEPS = [];
 
-const CONSTRUCTOR_R = /\bconstructor\((.*)\)/;
+const DEPS_R = /function\s*\((.*)?\)\s*\{|\((.*)?\)\s*=/;
 const COMMA_R = /[\,\s]+/g;
 
 const SINGLE_INSTANCE = 'SINGLE_INSTANCE';
@@ -16,7 +16,7 @@ class AlwaysNew {
 
   get(services) {
     const dependencies = this.deps.map(d => services.get(d));
-    return new this.service(...dependencies);
+    return this.service.create(...dependencies);
   }
 
   dispose() {}
@@ -31,9 +31,7 @@ class SingleInstance {
 
   instantiate(services) {
     const dependencies = this.deps.map(d => services.get(d));
-    const instance = new this.service(...dependencies);
-    this.instance = instance;
-    return instance;
+    return this.instance = this.service.create(...dependencies);
   }
 
   get(services) {
@@ -46,8 +44,9 @@ class SingleInstance {
 }
 
 const findDependencies = service => {
-  const s = service.toString()
-  const ds = (CONSTRUCTOR_R.exec(s) || [])[1] || '';
+  const s = service.create.toString();
+  const sa = DEPS_R.exec(s) || [];
+  const ds = sa[1] || sa[2] || '';
   return ds ? deps(ds) : NODEPS;
 };
 
