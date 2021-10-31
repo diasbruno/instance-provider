@@ -130,6 +130,15 @@ Provider.addSingleInstance(AuthToken).
 // whem they are requested
 (async function Example() {
   console.log("running example...");
+
+  try {
+    const userService = Provider.get(UserService.name);
+    const users = await userService.all();
+  } catch(e) {
+    console.log(e.message);
+    console.log("- not logged yet");
+  }
+
   try {
     const authService = Provider.get(AuthService.name);
 
@@ -156,13 +165,5 @@ Provider.addSingleInstance(AuthToken).
 
     const authToken = Provider.get(AuthToken.name);
     console.log("- token after logout", `'${authToken.token}'`);
-  }
-
-  try {
-    const userService = Provider.get(UserService.name);
-    const users = await userService.all();
-  } catch(e) {
-    console.log(e.message);
-    console.log("- not logged again");
   }
 })();
